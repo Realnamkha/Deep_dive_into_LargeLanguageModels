@@ -69,7 +69,7 @@ class Head(nn.Module):
     """one head of self attention"""
     def __init__(self,head_size):
         super().__init__()
-        self.key = nn.Linear(n_embd,head_size,bias=False)
+        self.key = nn.Linear(n_embd,head_size,bias=False) # Maps from embedding size  to head size 
         self.query = nn.Linear(n_embd,head_size,bias=False)
         self.value = nn.Linear(n_embd,head_size,bias=False)
         self.register_buffer('tril',torch.tril(torch.ones(block_size,block_size)))
@@ -78,7 +78,7 @@ class Head(nn.Module):
         
     def forward(self,x):
         B,T,C = x.shape
-        k = self.key(x)
+        k = self.key(x) #k=x@Wk
         q = self.query(x)
         # compute attention scores
         wei = q @ k.transpose(-2,-1)* C**-0.5 # (B,T,16) @ (B,16,T) --> B,T,T
@@ -153,9 +153,10 @@ class BigramLanguageModel(nn.Module):
         #     Block(n_embd,n_head=4),
         #     nn.LayerNorm(n_embd)
         # )
+        #This line is stacking n_layer Transformer blocks, where each block operates with n_embd embedding dimensions and n_head attention heads
         self.blocks = nn.Sequential(*[Block(n_embd,n_head=n_head) for _ in range(n_layer)])
         self.ln_f = nn.LayerNorm(n_embd) # final layer form
-        self.lm_head = nn.Linear(n_embd,vocab_size)
+        self.lm_head = nn.Linear(n_embd,vocab_size) # maps the final output to the vocab size
 
     def forward(self, idx, targets=None):
         B,T = idx.shape
@@ -164,7 +165,7 @@ class BigramLanguageModel(nn.Module):
         tok_emb = self.token_embedding_table(idx) #(B,T,C)
         pos_emb = self.position_embedding_table(torch.arange(T,device=device))
         x = tok_emb + pos_emb
-        x = self.blocks(x) # Apply on head attention # B,T,C
+        x = self.blocks(x) 
         x = self.ln_f(x) # B,T,C
         logits = self.lm_head(x) # (B,T,vocab_size)
 
