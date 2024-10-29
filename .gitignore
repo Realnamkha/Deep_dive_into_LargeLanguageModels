@@ -9,6 +9,8 @@ data/
 # Ignore JSON and BPE files
 *.json
 *.bpe
+*.json.1
+*.bpe.1
 
 # Ignore Python bytecode files
 __pycache__/
