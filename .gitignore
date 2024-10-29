@@ -6,6 +6,10 @@ data/
 *.csv
 *.txt
 
+# Ignore JSON and BPE files
+*.json
+*.bpe
+
 # Ignore Python bytecode files
 __pycache__/
 *.pyc
